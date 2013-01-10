@@ -47,10 +47,10 @@ if(!file_exists($fname))
   #in case of fail
   if(strpos($json,'error code 503')!==FALSE || strpos($json,'user is not authenticated or is not a player')!==FALSE)
   {
-    $fname='err_'.time().'_'.$code.'.txt';
+    $fname='cache/err_'.time().'_'.$code.'.txt';
     file_put_contents($fname,$json);
     add_log('Failed to make send password request (503), repeating...',1);
-    sleep(3);
+    sleep(2+rand(1,3));
     $json=send_passcode($cookie,$token,$code,$force);  
   }
   file_put_contents($fname,$json);
@@ -108,10 +108,10 @@ if(!file_exists($fname))
   
   if(strpos($json,'error code 503')!==FALSE)
   {
-    $fname='err_'.time().'_'.$code.'.txt';
+    $fname='cache/err_'.time().'_'.$code.'.txt';
     file_put_contents($fname,$json);
     add_log('Failed to make send chat log request (503), repeating...',1);
-    sleep(3);
+    sleep(2+rand(1,3));
     $json=get_log($cookie,$token);  
   }
   file_put_contents($fname,$json);

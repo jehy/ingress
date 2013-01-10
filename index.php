@@ -14,6 +14,7 @@ include 'userdata.php';
 add_log('current reload: '.date('Y-m-d H:i:s').'<hr>',1);
 set_log('log');
 
+sleep(rand(1,10));
   #error_reporting(E_ALL);
 
 $json=get_log($cookie_checker,$token_checker);
