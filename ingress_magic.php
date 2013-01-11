@@ -47,7 +47,7 @@ if(!file_exists($fname))
   #in case of fail
   if(is_tmp_error($json))
   {
-    $fname='cache/err_'.time().'_'.$code.'.txt';
+    $fname='cache/err_send_'.time().'_'.$code.'.txt';
     file_put_contents($fname,$json);
     add_log('Failed to make send password request (503), repeating...',1);
     sleep(2+rand(1,3));
@@ -121,7 +121,7 @@ if(!file_exists($fname))
   $max_attempts=5;
   if(is_tmp_error($json))
   {
-    $fname='cache/err_'.time().'_'.$code.'.txt';
+    $fname='cache/err_chat_'.time().'.txt';
     file_put_contents($fname,$json);
     add_log('Failed to make send chat phrase request (503), repeating...',1);
     sleep(10+rand(1,10));
@@ -186,7 +186,7 @@ if(!file_exists($fname))
   
   if(is_tmp_error($json))
   {
-    $fname='cache/err_'.time().'_'.$code.'.txt';
+    $fname='cache/err_log_'.time().'.txt';
     file_put_contents($fname,$json);
     add_log('Failed to make send chat log request (503), repeating...',1);
     sleep(2+rand(1,3));
