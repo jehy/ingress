@@ -62,6 +62,72 @@ else
 }
 
 
+function send_msg($cookie,$token,$text)
+{
+  
+  $query2='{"message":"'.$text.'","latE6":55755704,"lngE6":37548119,"factionOnly":true,"method":"dashboard.sendPlext"}';
+  
+        $useragent='Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11';
+        
+        $referer='http://www.ingress.com/intel';
+        
+        $path='/rpc/dashboard.sendPlext';
+        
+        $host='www.ingress.com';
+        
+        $query = 'POST ' . $path . ' HTTP/1.1' . "\r\n" . 
+                 'Host: ' . $host . "\r\n" . 
+                 'User-Agent: ' . $useragent . "\r\n";  
+        
+        if($cookie!='') $query.=
+                 'Cookie: ' . $cookie . "\r\n"; 
+        
+        if($referer!='') $query.=
+                 'Referer: ' . $referer . "\r\n"; 
+        
+        $query.= 'Connection: close' . "\r\n" . 
+                 'Origin: http://www.ingress.com' . "\r\n" . 
+                 'X-Requested-With: XMLHttpRequest' . "\r\n" . 
+                 'X-Csrftoken: '.$token . "\r\n" . 
+                 'Content-Type: application/json; charset=UTF-8' . "\r\n" . 
+                 'Accept: application/json, text/javascript, */*; q=0.01' . "\r\n" . 
+                 'Accept-Language: en-US,en;q=0.8,ru;q=0.6' . "\r\n" . 
+                 'Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.3' . "\r\n" ;
+        
+#search global area
+
+$query.= 'Content-Length: ' . strlen($query2)  . "\r\n\r\n";
+ $query.= $query2;
+                
+                
+$fname='cache/sendmsg_'.time().'.txt';
+if(!file_exists($fname))
+{
+  $json=( http($query));
+  @mkdir('cache',0777);
+  $attempt=0;
+  $max_attempts=5;
+  if(strpos($json,'error code 503')!==FALSE)
+  {
+    $fname='cache/err_'.time().'_'.$code.'.txt';
+    file_put_contents($fname,$json);
+    add_log('Failed to make send chat phrase request (503), repeating...',1);
+    sleep(10+rand(1,10));
+    $json=send_msg($cookie,$token,$text);
+    $attempt++;
+    if($attempt>$max_attempts)
+    {
+      add_log('Max attempts reached, breaking',1);
+      break;
+    }
+  }
+  file_put_contents($fname,$json);
+  return $json;
+}
+else
+  return false;
+
+}
 function get_log($cookie,$token)
 {
 
@@ -134,4 +200,10 @@ function check_badgerov($code)
   return 0;
 }
 
+
+function rand_shit()
+{
+$f=file('passcode_phrases.txt');
+return $f[rand(0,sizeof($f)-1)];
+}
 ?>

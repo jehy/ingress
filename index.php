@@ -135,6 +135,7 @@ foreach($codes as $val)
       if(stripos($r2,'Award'))
       {
         add_log('<font color="green">Success 2!</font>',1);
+        send_msg($cookie_to,$token_to,rand_shit().' '.$val);
       }
       else 
         add_log('<font color="red">Fail on 2!</font>',1);

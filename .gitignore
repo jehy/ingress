@@ -1,6 +1,7 @@
 #project
 cache/*
 userdata.php
+passcode_phrases.txt
 *.sql
 #################
 ## Eclipse

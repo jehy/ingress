@@ -20,6 +20,8 @@ $cookie_to='csrftoken=XtMA5QKHICpAj4mpJi9SCC9DM7R6; __utma=24037858.702319769.13
         
 $token_to='XtMA5QKHICpAjilWM7R6';
 
+$chat_token=$token_to;
+$chat_cookie=$cookie_to;
 
 //change places
 /*
