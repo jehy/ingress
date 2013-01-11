@@ -1,414 +1,411 @@
 <?
 #
 # HTTP_MAGIC.PHP v.25/05/11   v3.82
-# функции для работы с протоколом HTTP/SSL и данными в HTML.
+# С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РїСЂРѕС‚РѕРєРѕР»РѕРј HTTP/SSL Рё РґР°РЅРЅС‹РјРё РІ HTML.
 #
 #
-#    http($request,$port=80,$ssl=false,$read=true) # общая функция для запросов.
+#    http($request,$port=80,$ssl=false,$read=true) # РѕР±С‰Р°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ Р·Р°РїСЂРѕСЃРѕРІ.
 #
-#         $request      -       полный http запрос
-#         $port         -       можно указать порт коннекта
-#         $ssl          -       true/false (ssl или обычный)
-#         $read         -       true/false/header (читать, не читать, читать только заголовок ответа)
+#         $request      -       РїРѕР»РЅС‹Р№ http Р·Р°РїСЂРѕСЃ
+#         $port         -       РјРѕР¶РЅРѕ СѓРєР°Р·Р°С‚СЊ РїРѕСЂС‚ РєРѕРЅРЅРµРєС‚Р°
+#         $ssl          -       true/false (ssl РёР»Рё РѕР±С‹С‡РЅС‹Р№)
+#         $read         -       true/false/header (С‡РёС‚Р°С‚СЊ, РЅРµ С‡РёС‚Р°С‚СЊ, С‡РёС‚Р°С‚СЊ С‚РѕР»СЊРєРѕ Р·Р°РіРѕР»РѕРІРѕРє РѕС‚РІРµС‚Р°)
 #
-#    http_get($addr,$cookies=array(),$referer='',$useragent='....',$ssl=false,$read=true)     ! в версии 3.5 функцию не проверял
+#    http_get($addr,$cookies=array(),$referer='',$useragent='....',$ssl=false,$read=true)     ! РІ РІРµСЂСЃРёРё 3.5 С„СѓРЅРєС†РёСЋ РЅРµ РїСЂРѕРІРµСЂСЏР»
 #
-#         $addr         -       адрес скачиваемой страницы (http://www.domain.com/page.html или www.domain.com/page.html)
-#         $cookies      -       можно передать стандартный массив кук, полученный функцией cookies($header);
-#         $referer      -       можно передать реферала страницы
-#         $useragent    -       можно передать юзерагент
-#         $port         -       можно указать порт коннекта
-#         $ssl          -       true/false (ssl или обычный)
-#         $read         -       true/false/header (читать, не читать, читать только заголовок ответа)
+#         $addr         -       Р°РґСЂРµСЃ СЃРєР°С‡РёРІР°РµРјРѕР№ СЃС‚СЂР°РЅРёС†С‹ (http://www.domain.com/page.html РёР»Рё www.domain.com/page.html)
+#         $cookies      -       РјРѕР¶РЅРѕ РїРµСЂРµРґР°С‚СЊ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РјР°СЃСЃРёРІ РєСѓРє, РїРѕР»СѓС‡РµРЅРЅС‹Р№ С„СѓРЅРєС†РёРµР№ cookies($header);
+#         $referer      -       РјРѕР¶РЅРѕ РїРµСЂРµРґР°С‚СЊ СЂРµС„РµСЂР°Р»Р° СЃС‚СЂР°РЅРёС†С‹
+#         $useragent    -       РјРѕР¶РЅРѕ РїРµСЂРµРґР°С‚СЊ СЋР·РµСЂР°РіРµРЅС‚
+#         $port         -       РјРѕР¶РЅРѕ СѓРєР°Р·Р°С‚СЊ РїРѕСЂС‚ РєРѕРЅРЅРµРєС‚Р°
+#         $ssl          -       true/false (ssl РёР»Рё РѕР±С‹С‡РЅС‹Р№)
+#         $read         -       true/false/header (С‡РёС‚Р°С‚СЊ, РЅРµ С‡РёС‚Р°С‚СЊ, С‡РёС‚Р°С‚СЊ С‚РѕР»СЊРєРѕ Р·Р°РіРѕР»РѕРІРѕРє РѕС‚РІРµС‚Р°)
 #
 #
-#    cookies($header,$cookies=array()) # Экстракт и синхронизация кукис
+#    cookies($header,$cookies=array()) # Р­РєСЃС‚СЂР°РєС‚ Рё СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РєСѓРєРёСЃ
 #
-#         $header       -       свежеполученный хидер
-#         $cookies      -       массив с куками извлеченными ранее при помощи cookies()
-#         для использования кукисов в запросах используйте $cookie=implode("\r\n",$cookies);
+#         $header       -       СЃРІРµР¶РµРїРѕР»СѓС‡РµРЅРЅС‹Р№ С…РёРґРµСЂ
+#         $cookies      -       РјР°СЃСЃРёРІ СЃ РєСѓРєР°РјРё РёР·РІР»РµС‡РµРЅРЅС‹РјРё СЂР°РЅРµРµ РїСЂРё РїРѕРјРѕС‰Рё cookies()
+#         РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РєСѓРєРёСЃРѕРІ РІ Р·Р°РїСЂРѕСЃР°С… РёСЃРїРѕР»СЊР·СѓР№С‚Рµ $cookie=implode("\r\n",$cookies);
 #
 #
 #    form_extractor($html,$clear=true)
 #
-#       Добывает все инпуты из всех форм (работает только с тегами <input, текстарии и прочие селекты не канают, значения берёт только указанные)
-#       После чего выдёргивает из них все пропертисы и в случае если указана $clear=true (по умолчанию указана!) оставляет только name и value
-#       Соответственно в результате либо массив массивов знаений инпутов[form_i]=>[input_name]=>[input_value]
-#       либо массив массивов массивов [form_i]=>[input_name]=>[input_prop_name]=>[input_prop_value];
+#       Р”РѕР±С‹РІР°РµС‚ РІСЃРµ РёРЅРїСѓС‚С‹ РёР· РІСЃРµС… С„РѕСЂРј (СЂР°Р±РѕС‚Р°РµС‚ С‚РѕР»СЊРєРѕ СЃ С‚РµРіР°РјРё <input, С‚РµРєСЃС‚Р°СЂРёРё Рё РїСЂРѕС‡РёРµ СЃРµР»РµРєС‚С‹ РЅРµ РєР°РЅР°СЋС‚, Р·РЅР°С‡РµРЅРёСЏ Р±РµСЂС‘С‚ С‚РѕР»СЊРєРѕ СѓРєР°Р·Р°РЅРЅС‹Рµ)
+#       РџРѕСЃР»Рµ С‡РµРіРѕ РІС‹РґС‘СЂРіРёРІР°РµС‚ РёР· РЅРёС… РІСЃРµ РїСЂРѕРїРµСЂС‚РёСЃС‹ Рё РІ СЃР»СѓС‡Р°Рµ РµСЃР»Рё СѓРєР°Р·Р°РЅР° $clear=true (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ СѓРєР°Р·Р°РЅР°!) РѕСЃС‚Р°РІР»СЏРµС‚ С‚РѕР»СЊРєРѕ name Рё value
+#       РЎРѕРѕС‚РІРµС‚СЃС‚РІРµРЅРЅРѕ РІ СЂРµР·СѓР»СЊС‚Р°С‚Рµ Р»РёР±Рѕ РјР°СЃСЃРёРІ РјР°СЃСЃРёРІРѕРІ Р·РЅР°РµРЅРёР№ РёРЅРїСѓС‚РѕРІ[form_i]=>[input_name]=>[input_value]
+#       Р»РёР±Рѕ РјР°СЃСЃРёРІ РјР°СЃСЃРёРІРѕРІ РјР°СЃСЃРёРІРѕРІ [form_i]=>[input_name]=>[input_prop_name]=>[input_prop_value];
 #
-#       $html - код страницы
-#       $clear - true (только имена и значения инпутов) / false (все свойства инпутов массивом)
+#       $html - РєРѕРґ СЃС‚СЂР°РЅРёС†С‹
+#       $clear - true (С‚РѕР»СЊРєРѕ РёРјРµРЅР° Рё Р·РЅР°С‡РµРЅРёСЏ РёРЅРїСѓС‚РѕРІ) / false (РІСЃРµ СЃРІРѕР№СЃС‚РІР° РёРЅРїСѓС‚РѕРІ РјР°СЃСЃРёРІРѕРј)
 #
 #
 #    tag_props_extractor($html)
-#       Добывает из тега все пропертисы!.
-#       Тег ($html) должен быть голый.
-#       т.е. из
+#       Р”РѕР±С‹РІР°РµС‚ РёР· С‚РµРіР° РІСЃРµ РїСЂРѕРїРµСЂС‚РёСЃС‹!.
+#       РўРµРі ($html) РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РіРѕР»С‹Р№.
+#       С‚.Рµ. РёР·
 #               <a href="..." target="..." color="...">...</a>
-#       нужно только
+#       РЅСѓР¶РЅРѕ С‚РѕР»СЊРєРѕ
 #               href="..." target="..." color="..."
 #
 #
 #
 #
 #    TODO:
-#       * Добавить возможность сохранять, загружать, загружать последнюю сохранённую сессию - т.е. куки
-#       * Добавить возможность делить куки по доменам внутри единого контейнера (отдельную функцию типа cookies_domain($cookies,)
+#       * Р”РѕР±Р°РІРёС‚СЊ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ СЃРѕС…СЂР°РЅСЏС‚СЊ, Р·Р°РіСЂСѓР¶Р°С‚СЊ, Р·Р°РіСЂСѓР¶Р°С‚СЊ РїРѕСЃР»РµРґРЅСЋСЋ СЃРѕС…СЂР°РЅС‘РЅРЅСѓСЋ СЃРµСЃСЃРёСЋ - С‚.Рµ. РєСѓРєРё
+#       * Р”РѕР±Р°РІРёС‚СЊ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РґРµР»РёС‚СЊ РєСѓРєРё РїРѕ РґРѕРјРµРЅР°Рј РІРЅСѓС‚СЂРё РµРґРёРЅРѕРіРѕ РєРѕРЅС‚РµР№РЅРµСЂР° (РѕС‚РґРµР»СЊРЅСѓСЋ С„СѓРЅРєС†РёСЋ С‚РёРїР° cookies_domain($cookies,)
 #
 
 
-
-function http($request,$port=80,$ssl=false,$read=true) # общая функция.
+function http($request, $port = 80, $ssl = false, $read = true) # РѕР±С‰Р°СЏ С„СѓРЅРєС†РёСЏ.
 {
-    #    echo eee('HTTP Request: ',$request);
-        $addr=explode('host: ',strtolower($request),2);
-        $addr=explode("\n",$addr[1],2);
-        $addr=trim($addr[0]);
+  #    echo eee('HTTP Request: ',$request);
+  $addr = explode('host: ', strtolower($request), 2);
+  $addr = explode("\n", $addr[1], 2);
+  $addr = trim($addr[0]);
 
-        $f=http_open($addr,$port,$ssl); # новый
-        if($f==false)return $f;
+  $f = http_open($addr, $port, $ssl); # РЅРѕРІС‹Р№
+  if ($f == false) return $f;
 
-        @stream_set_blocking($f,1);
+  @stream_set_blocking($f, 1);
 
-        fwrite($f, $request); # отправляем запрос
+  fwrite($f, $request); # РѕС‚РїСЂР°РІР»СЏРµРј Р·Р°РїСЂРѕСЃ
 
-        if($read==false)return;
-        $data='';
-        while(true)
-        {
-                $line=fgets($f);
-                $data.=$line;
-                if($line==="\r\n")
-                {
-                        $method=http_method($data);
-                        break;
-                }
-        }
+  if ($read == false) return;
+  $data = '';
+  while (true)
+  {
+    $line = fgets($f);
+    $data .= $line;
+    if ($line === "\r\n")
+    {
+      $method = http_method($data);
+      break;
+    }
+  }
 
-        if($read==='header')return $data;
+  if ($read === 'header') return $data;
 
-        if($method==='chunked') # читаем методом CHUNKED
-        {
-                $data.=http_read_chunked($f);
-        }
-        else
-        {
-                $data.= http_read_all($f); # читаем обычным методом
-        }
-        fclose($f);
-     #   echo eee('HTTP Result: ',$data);
+  if ($method === 'chunked') # С‡РёС‚Р°РµРј РјРµС‚РѕРґРѕРј CHUNKED
+  {
+    $data .= http_read_chunked($f);
+  }
+  else
+  {
+    $data .= http_read_all($f); # С‡РёС‚Р°РµРј РѕР±С‹С‡РЅС‹Рј РјРµС‚РѕРґРѕРј
+  }
+  fclose($f);
+  #   echo eee('HTTP Result: ',$data);
 
-        return $data;
+  return $data;
 }
 
-function http_get($addr,$cookies=array(),$referer='',$useragent='Mozilla/5.0 (Windows; U; Windows NT 6.1; ru; rv:1.9.2.15) Gecko/20110303 MRA 5.7 (build 03686) Firefox/3.6.15')
+function http_get($addr, $cookies = array(), $referer = '', $useragent = 'Mozilla/5.0 (Windows; U; Windows NT 6.1; ru; rv:1.9.2.15) Gecko/20110303 MRA 5.7 (build 03686) Firefox/3.6.15')
 {
-        # Для ускорения работы с методом GET
-        $x=explode('//',$addr,2);
-        if(strtolower($x[0])=='http:')$addr=$addr[1];
+  # Р”Р»СЏ СѓСЃРєРѕСЂРµРЅРёСЏ СЂР°Р±РѕС‚С‹ СЃ РјРµС‚РѕРґРѕРј GET
+  $x = explode('//', $addr, 2);
+  if (strtolower($x[0]) == 'http:') $addr = $addr[1];
 
-        $addr=explode('/',$addr,2);
+  $addr = explode('/', $addr, 2);
 
-        $query = 'GET /' . $addr[1] . ' HTTP/1.1' . "\r\n" .
-                 'Host: ' . $addr[0] . "\r\n" .
-                 'User-Agent: ' . $useragent . "\r\n";
+  $query = 'GET /' . $addr[1] . ' HTTP/1.1' . "\r\n" .
+    'Host: ' . $addr[0] . "\r\n" .
+    'User-Agent: ' . $useragent . "\r\n";
 
-        if($cookie!='')
-        $query.= 'Cookie: ' . implode('; ',$cookies) . "\r\n";
+#  if ($cookie != '')
+    $query .= 'Cookie: ' . implode('; ', $cookies) . "\r\n";
 
-        if($referer!='')
-        $referer.= 'Referer: ' . $referer . "\r\n";
+  if ($referer != '')
+    $referer .= 'Referer: ' . $referer . "\r\n";
 
-        $query.= 'Connection: close' . "\r\n" .
-                 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' . "\r\n" .
-                 'Accept-Language: en-us,en;q=0.7,ru;q=0.3' . "\r\n" .
-                 'Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.7' . "\r\n" . "\r\n";
+  $query .= 'Connection: close' . "\r\n" .
+    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' . "\r\n" .
+    'Accept-Language: en-us,en;q=0.7,ru;q=0.3' . "\r\n" .
+    'Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.7' . "\r\n" . "\r\n";
 
-        $res=http($query); # http_v_3
-        return $res;
+  $res = http($query); # http_v_3
+  return $res;
 }
 
 function http_method($header)
 {
-        $header=header_parser($header);
-        $method=strtolower($header['transfer-encoding']);
-        if($method!='chunked')return 'plain'; else return 'chunked';
+  $header = header_parser($header);
+  $method = strtolower($header['transfer-encoding']);
+  if ($method != 'chunked') return 'plain';
+  else return 'chunked';
 }
 
-function http_read_all($f) # читает документ целиком в обычном режиме. для ф-ии HTTP
+function http_read_all($f) # С‡РёС‚Р°РµС‚ РґРѕРєСѓРјРµРЅС‚ С†РµР»РёРєРѕРј РІ РѕР±С‹С‡РЅРѕРј СЂРµР¶РёРјРµ. РґР»СЏ С„-РёРё HTTP
 {
-        $data='';
-        while (!feof($f))$data.=fgets($f, 16384);
-        return $data;
+  $data = '';
+  while (!feof($f)) $data .= fgets($f, 16384);
+  return $data;
 }
 
-function http_error($e='')
+function http_error($e = '')
 {
-        if(!$e)$e=@error_get_last();else $e['message']=$e;
-        if(!$e)$e=$php_errormsg;
-        echo '<div style="padding:20px;background-color:#FFFFCC;border:1px solid silver">http_magic error: <b>' . $e['message'] . '</b></div>';
+  if (!$e) $e = @error_get_last();
+  else $e['message'] = $e;
+  if (!$e) $e = $php_errormsg;
+  echo '<div style="padding:20px;background-color:#FFFFCC;border:1px solid silver">http_magic error: <b>' . $e['message'] . '</b></div>';
 }
 
-function http_open($addr,$port=80,$ssl=false) # функция открытия соединения. для ф-ии HTTP
+function http_open($addr, $port = 80, $ssl = false) # С„СѓРЅРєС†РёСЏ РѕС‚РєСЂС‹С‚РёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ. РґР»СЏ С„-РёРё HTTP
 {
-        if($ssl)$addr='ssl://' . $addr;
-        $f=@fsockopen($addr, $port, $errno, $errstr, 5);
-        if($f===false)http_error();
-        return $f;
+  if ($ssl) $addr = 'ssl://' . $addr;
+  $f = @fsockopen($addr, $port, $errno, $errstr, 5);
+  if ($f === false) http_error();
+  return $f;
 }
 
-function http_read_chunked($f)  # адекватное чтение в случае режима CHUNKED (нужно обязательно при чтении картинок)
+function http_read_chunked($f) # Р°РґРµРєРІР°С‚РЅРѕРµ С‡С‚РµРЅРёРµ РІ СЃР»СѓС‡Р°Рµ СЂРµР¶РёРјР° CHUNKED (РЅСѓР¶РЅРѕ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РїСЂРё С‡С‚РµРЅРёРё РєР°СЂС‚РёРЅРѕРє)
 {
-        $length=fgets($f);
-        $length=hexdec($length);
-
-        while(true)
-        {
-                if ($length < 1)break;
-                $x='';
-                while(strlen($x)<$length)
-                {
-                        $b=fread($f, $length-strlen($x));
-                        if($b=='')return $data;
-                        $x.=$b;
-                }
-                $data.= $x;
-                fgets($f);
-                $length = rtrim(fgets($f));
-                $length = hexdec($length);
-        }
-        return $data;
+  $length = fgets($f);
+  $length = hexdec($length);
+  $data='';
+  while (true)
+  {
+    if ($length < 1) break;
+    $x = '';
+    while (strlen($x) < $length)
+    {
+      $b = fread($f, $length - strlen($x));
+      if ($b == '') return $data;
+      $x .= $b;
+    }
+    $data .= $x;
+    fgets($f);
+    $length = rtrim(fgets($f));
+    $length = hexdec($length);
+  }
+  return $data;
 }
 
 
-function header_parser($header) # Парсит хидеры и достаёт из них всё ценное.
+function header_parser($header) # РџР°СЂСЃРёС‚ С…РёРґРµСЂС‹ Рё РґРѕСЃС‚Р°С‘С‚ РёР· РЅРёС… РІСЃС‘ С†РµРЅРЅРѕРµ.
 {
-        $headers=explode("\r\n\r\n",$header,2);
-        $headers=explode("\r\n",trim($headers[0]));
-        $http=trim(array_shift($headers));
-        $harray=array(); #all headers
-        $cookies=array(); #cookies
-        foreach($headers as $i=>$header)
-        {
-                $header=explode(':',trim($header),2);
-                $type=strtolower($header[0]);
-                $value=trim($header[1]);
-                if($type=='set-cookie')
-                {
-                        $value=explode(';',$value,2);
-                        $harray['set-cookie'][]=$value[0];
-                }
-                else
-                {
-                        $harray[$type]=$value;
-                }
-        }
-        return $harray;
+  $headers = explode("\r\n\r\n", $header, 2);
+  $headers = explode("\r\n", trim($headers[0]));
+  $http = trim(array_shift($headers));
+  $harray = array(); #all headers
+  $cookies = array(); #cookies
+  foreach ($headers as $i => $header)
+  {
+    $header = explode(':', trim($header), 2);
+    $type = strtolower($header[0]);
+    $value = trim($header[1]);
+    if ($type == 'set-cookie')
+    {
+      $value = explode(';', $value, 2);
+      $harray['set-cookie'][] = $value[0];
+    }
+    else
+    {
+      $harray[$type] = $value;
+    }
+  }
+  return $harray;
 }
 
-function extract_charset($header) # из хидера вытаскивает название кодировки
+function extract_charset($header) # РёР· С…РёРґРµСЂР° РІС‹С‚Р°СЃРєРёРІР°РµС‚ РЅР°Р·РІР°РЅРёРµ РєРѕРґРёСЂРѕРІРєРё
 {
-        $charset=explode('charset=',$header,2);
-        $charset=explode("\r\n",$charset[1],2);
-        $charset=explode(';',$charset[0],2);
-        $charset=$charset[0];
-        return $charset;
+  $charset = explode('charset=', $header, 2);
+  $charset = explode("\r\n", $charset[1], 2);
+  $charset = explode(';', $charset[0], 2);
+  $charset = $charset[0];
+  return $charset;
 }
 
-function cookies($header,$cookies=array()) # Возвращает массив кук. элементы вида cookeis[0]="name=value"; Может совмещать куки с массивом cookies, такого же вида.
+function cookies($header, $cookies = array()) # Р’РѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ РєСѓРє. СЌР»РµРјРµРЅС‚С‹ РІРёРґР° cookeis[0]="name=value"; РњРѕР¶РµС‚ СЃРѕРІРјРµС‰Р°С‚СЊ РєСѓРєРё СЃ РјР°СЃСЃРёРІРѕРј cookies, С‚Р°РєРѕРіРѕ Р¶Рµ РІРёРґР°.
 {
-        $headers=explode("\r\n\r\n",$header,2);
-        $headers=explode("\r\n",trim($headers[0]));
-        $http=trim(array_pop($headers));
-        foreach($headers as $i=>$header)
-        {
-                $header=explode(':',trim($header),2);
-                $type=strtolower($header[0]);
-                $value=trim($header[1]);
-                if($type=='set-cookie')
-                {
-                        $value=explode(';',$value,2);
-                        $cookies[]=$value[0];
-                }
-        }
-        return cl_cookies($cookies);
+  $headers = explode("\r\n\r\n", $header, 2);
+  $headers = explode("\r\n", trim($headers[0]));
+  $http = trim(array_pop($headers));
+  foreach ($headers as $i => $header)
+  {
+    $header = explode(':', trim($header), 2);
+    $type = strtolower($header[0]);
+    $value = trim($header[1]);
+    if ($type == 'set-cookie')
+    {
+      $value = explode(';', $value, 2);
+      $cookies[] = $value[0];
+    }
+  }
+  return cl_cookies($cookies);
 }
 
-function cl_cookies($cookies) # "чистит" массив кук. Вспомогательная для cookies
+function cl_cookies($cookies) # "С‡РёСЃС‚РёС‚" РјР°СЃСЃРёРІ РєСѓРє. Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ РґР»СЏ cookies
 {
-        $cl=array();
-        foreach($cookies as $c)
-        {
-                $c=explode('=',$c,2);
-                $cl[$c[0]]=$c[1];
-        }
-        $cookies=array();
-        foreach($cl as $name=>$c)
-        {
-                $cookies[]=$name . '=' . $c;
-        }
-        return $cookies;
+  $cl = array();
+  foreach ($cookies as $c)
+  {
+    $c = explode('=', $c, 2);
+    $cl[$c[0]] = $c[1];
+  }
+  $cookies = array();
+  foreach ($cl as $name => $c)
+  {
+    $cookies[] = $name . '=' . $c;
+  }
+  return $cookies;
 
 }
 
-# Добывает все инпуты из всех форм (работает только с тегами <input, текстарии и прочие селекты не канают, значения берёт только указанные)
-# После чего выдёргивает из них все пропертисы и в случае если указана $clear=true (по умолчанию указана!) оставляет только name и value
-# Соответственно в результате либо массив массивов знаений инпутов[form_i]=>[input_name]=>[input_value]
-# либо массив массивов массивов [form_i]=>[input_name]=>[input_prop_name]=>[input_prop_value];
-function form_extractor($html,$clear=true)
+# Р”РѕР±С‹РІР°РµС‚ РІСЃРµ РёРЅРїСѓС‚С‹ РёР· РІСЃРµС… С„РѕСЂРј (СЂР°Р±РѕС‚Р°РµС‚ С‚РѕР»СЊРєРѕ СЃ С‚РµРіР°РјРё <input, С‚РµРєСЃС‚Р°СЂРёРё Рё РїСЂРѕС‡РёРµ СЃРµР»РµРєС‚С‹ РЅРµ РєР°РЅР°СЋС‚, Р·РЅР°С‡РµРЅРёСЏ Р±РµСЂС‘С‚ С‚РѕР»СЊРєРѕ СѓРєР°Р·Р°РЅРЅС‹Рµ)
+# РџРѕСЃР»Рµ С‡РµРіРѕ РІС‹РґС‘СЂРіРёРІР°РµС‚ РёР· РЅРёС… РІСЃРµ РїСЂРѕРїРµСЂС‚РёСЃС‹ Рё РІ СЃР»СѓС‡Р°Рµ РµСЃР»Рё СѓРєР°Р·Р°РЅР° $clear=true (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ СѓРєР°Р·Р°РЅР°!) РѕСЃС‚Р°РІР»СЏРµС‚ С‚РѕР»СЊРєРѕ name Рё value
+# РЎРѕРѕС‚РІРµС‚СЃС‚РІРµРЅРЅРѕ РІ СЂРµР·СѓР»СЊС‚Р°С‚Рµ Р»РёР±Рѕ РјР°СЃСЃРёРІ РјР°СЃСЃРёРІРѕРІ Р·РЅР°РµРЅРёР№ РёРЅРїСѓС‚РѕРІ[form_i]=>[input_name]=>[input_value]
+# Р»РёР±Рѕ РјР°СЃСЃРёРІ РјР°СЃСЃРёРІРѕРІ РјР°СЃСЃРёРІРѕРІ [form_i]=>[input_name]=>[input_prop_name]=>[input_prop_value];
+function form_extractor($html, $clear = true)
 {
-        $forms=array();
-        $offset=0;
-        $id=0;
-        while(true)
-        {
-                $find=stripos($html,'<form ',$offset);
-                if($find===false)break;
-                $start=$find;
-                $end=stripos($html,'</form',$start);
-                if($end==false)$end=strlen($html)-1;
-                $offset=$end;
-                $form=substr($html,$start+5,$end-$start-5);
-                $inputs=input_extractor($form);
-                $form=substr($form,0,strpos($form,'>'));
-                $form=tag_props_extractor($form);
-                $name=$form['name'];
-                if($name=='')$name=$form['id'];
-                if($name==''||isset($forms[$name]))$name=$id++;
-                $forms[$name]=array('properties'=>$form,'inputs'=>$inputs);
-        }
-        return $forms;
+  $forms = array();
+  $offset = 0;
+  $id = 0;
+  while (true)
+  {
+    $find = stripos($html, '<form ', $offset);
+    if ($find === false) break;
+    $start = $find;
+    $end = stripos($html, '</form', $start);
+    if ($end == false) $end = strlen($html) - 1;
+    $offset = $end;
+    $form = substr($html, $start + 5, $end - $start - 5);
+    $inputs = input_extractor($form);
+    $form = substr($form, 0, strpos($form, '>'));
+    $form = tag_props_extractor($form);
+    $name = $form['name'];
+    if ($name == '') $name = $form['id'];
+    if ($name == '' || isset($forms[$name])) $name = $id++;
+    $forms[$name] = array('properties' => $form, 'inputs' => $inputs);
+  }
+  return $forms;
 }
 
-# Добывает все инпуты из формы (работает только с тегами <input, текстарии и прочие селекты не канают, значения берёт только указанные)
-# После чего выдёргивает из них все пропертисы и в случае если указана $clear=true (по умолчанию указана!) оставляет только name и value
-# Соответственно в результате либо массив name=>value либо массив массивов name=>array(...props...);
-# Exclude_image - исключает попадание input type=image в результаты. Вхуй! Заебали тут толпиться!
-function input_extractor($html,$clear=true,$exclude_image=true)
+# Р”РѕР±С‹РІР°РµС‚ РІСЃРµ РёРЅРїСѓС‚С‹ РёР· С„РѕСЂРјС‹ (СЂР°Р±РѕС‚Р°РµС‚ С‚РѕР»СЊРєРѕ СЃ С‚РµРіР°РјРё <input, С‚РµРєСЃС‚Р°СЂРёРё Рё РїСЂРѕС‡РёРµ СЃРµР»РµРєС‚С‹ РЅРµ РєР°РЅР°СЋС‚, Р·РЅР°С‡РµРЅРёСЏ Р±РµСЂС‘С‚ С‚РѕР»СЊРєРѕ СѓРєР°Р·Р°РЅРЅС‹Рµ)
+# РџРѕСЃР»Рµ С‡РµРіРѕ РІС‹РґС‘СЂРіРёРІР°РµС‚ РёР· РЅРёС… РІСЃРµ РїСЂРѕРїРµСЂС‚РёСЃС‹ Рё РІ СЃР»СѓС‡Р°Рµ РµСЃР»Рё СѓРєР°Р·Р°РЅР° $clear=true (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ СѓРєР°Р·Р°РЅР°!) РѕСЃС‚Р°РІР»СЏРµС‚ С‚РѕР»СЊРєРѕ name Рё value
+# РЎРѕРѕС‚РІРµС‚СЃС‚РІРµРЅРЅРѕ РІ СЂРµР·СѓР»СЊС‚Р°С‚Рµ Р»РёР±Рѕ РјР°СЃСЃРёРІ name=>value Р»РёР±Рѕ РјР°СЃСЃРёРІ РјР°СЃСЃРёРІРѕРІ name=>array(...props...);
+# Exclude_image - РёСЃРєР»СЋС‡Р°РµС‚ РїРѕРїР°РґР°РЅРёРµ input type=image РІ СЂРµР·СѓР»СЊС‚Р°С‚С‹. Р’С…СѓР№! Р—Р°РµР±Р°Р»Рё С‚СѓС‚ С‚РѕР»РїРёС‚СЊСЃСЏ!
+function input_extractor($html, $clear = true, $exclude_image = true)
 {
-        $inputs=array();
-        $offset=0;
-        while(true)
-        {
-                $find=stripos($html,'<input ',$offset);
-                if($find===false)break;
+  $inputs = array();
+  $offset = 0;
+  while (true)
+  {
+    $find = stripos($html, '<input ', $offset);
+    if ($find === false) break;
 
-                $start=$find;
-                $end=stripos($html,'>',$start);
-                if($end==false)$end=strlen($html)-1;
-                $offset=$end;
+    $start = $find;
+    $end = stripos($html, '>', $start);
+    if ($end == false) $end = strlen($html) - 1;
+    $offset = $end;
 
-                $input=substr($html,$start+6,$end-$start-6);
-                $props=tag_props_extractor($input);
-                if(strtolower($props['type'])!='image'||$exclude_image==false)
-                {
-                        if($clear)
-                        {
-                                # name=>value!
-                                if($props['name']!='')$inputs[$props['name']]=$props['value'];
-                        }
-                        else
-                        {
-                                # name=>array();
-                                if($props['name']!='')$inputs[$props['name']]=$props;
-                        }
-                }
+    $input = substr($html, $start + 6, $end - $start - 6);
+    $props = tag_props_extractor($input);
+    if (strtolower($props['type']) != 'image' || $exclude_image == false)
+    {
+      if ($clear)
+      {
+        # name=>value!
+        if ($props['name'] != '') $inputs[$props['name']] = $props['value'];
+      }
+      else
+      {
+        # name=>array();
+        if ($props['name'] != '') $inputs[$props['name']] = $props;
+      }
+    }
 
-        }
-        return $inputs;
+  }
+  return $inputs;
 }
 
-# Добывает из тега все пропертисы!.
-# Тег должен быть голый.
-# т.е. из
+# Р”РѕР±С‹РІР°РµС‚ РёР· С‚РµРіР° РІСЃРµ РїСЂРѕРїРµСЂС‚РёСЃС‹!.
+# РўРµРі РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РіРѕР»С‹Р№.
+# С‚.Рµ. РёР·
 #        <a href="..." target="..." color="...">...</a>
-# нужно только
+# РЅСѓР¶РЅРѕ С‚РѕР»СЊРєРѕ
 #        href="..." target="..." color="..."
 function tag_props_extractor($html)
 {
-        $html=trim($html);
-        $props=array();
+  $html = trim($html);
+  $props = array();
 
 
-        $begin=false;
-        $char='';
-        $name='';
-        $value='';
-        $i=0;
-        for($i=$i;$i<strlen($html);$i++)
-        {
-                # Если найден пробел, значит мы нашли аттрибут без значения
-                if($html[$i]==' ')
-                {
-                        if(trim($name)!='')$props[$name]='';
-                        $name='';
-                        # После аттрибута может быть куча пробелов
-                        while($html[$i]===' ')$i++;
-                }
-                if($html[$i]=='=')
-                {
-                        # Begin!;
-                        $i++;
-                        $char=$html[$i];
-                        if($char=='"'||$char=="'")
-                        {
-                                # Нормальные разделители
-                                $i++; # Сдвиг
-                        }
-                        elseif($char==' ')
-                        {
-                                # Ну не должно там быть пробела никогда
-                                echo '<font color=red>Ебанутый инпут, хуй знает что будет за результат: <b>' . $html . '</b></font><Br>';
-                                if(trim($name)!='')$props[$name]='';
-                                $name='';
-                                $char=false;
-                        }
-                        else
-                        {
-                                # Разделителя нету... значит разделитель в конце пробел
-                                $char=' ';
-                        }
-                        # Разделитель определён, теперь поймать значение учитывая конец
-                        while(true&&$char!==false)
-                        {
-                                if($html[$i]=='')break;
-                                if($html[$i]==$char)break;
-                                # Если тот кто вызвал функцию мудак, то концом обеда будет >
-                                if($char==' ' && $html[$i]=='>')break;
-                                $value.=$html[$i];
-                                $i++;
-                        }
-                        $name=strtolower($name);
-                        if($name=='name')$value=Cleaner($value);
-                        $props[strtolower(trim($name))] = trim($value);
-                        //if($name=='name')echo '&' . $value .  '(' . strlen($value).')=&<br>';
-                        $name='';
-                        $value='';
-                }
-                else
-                {
-                        # Часть имени
-                        $name .= $html[$i];
-                }
-        }
-        return $props;
+  $begin = false;
+  $char = '';
+  $name = '';
+  $value = '';
+  $i = 0;
+  for ($i = $i; $i < strlen($html); $i++)
+  {
+    # Р•СЃР»Рё РЅР°Р№РґРµРЅ РїСЂРѕР±РµР», Р·РЅР°С‡РёС‚ РјС‹ РЅР°С€Р»Рё Р°С‚С‚СЂРёР±СѓС‚ Р±РµР· Р·РЅР°С‡РµРЅРёСЏ
+    if ($html[$i] == ' ')
+    {
+      if (trim($name) != '') $props[$name] = '';
+      $name = '';
+      # РџРѕСЃР»Рµ Р°С‚С‚СЂРёР±СѓС‚Р° РјРѕР¶РµС‚ Р±С‹С‚СЊ РєСѓС‡Р° РїСЂРѕР±РµР»РѕРІ
+      while ($html[$i] === ' ') $i++;
+    }
+    if ($html[$i] == '=')
+    {
+      # Begin!;
+      $i++;
+      $char = $html[$i];
+      if ($char == '"' || $char == "'")
+      {
+        # РќРѕСЂРјР°Р»СЊРЅС‹Рµ СЂР°Р·РґРµР»РёС‚РµР»Рё
+        $i++; # РЎРґРІРёРі
+      }
+      elseif ($char == ' ')
+      {
+        # РќСѓ РЅРµ РґРѕР»Р¶РЅРѕ С‚Р°Рј Р±С‹С‚СЊ РїСЂРѕР±РµР»Р° РЅРёРєРѕРіРґР°
+        echo '<font color=red>Р•Р±Р°РЅСѓС‚С‹Р№ РёРЅРїСѓС‚, С…СѓР№ Р·РЅР°РµС‚ С‡С‚Рѕ Р±СѓРґРµС‚ Р·Р° СЂРµР·СѓР»СЊС‚Р°С‚: <b>' . $html . '</b></font><Br>';
+        if (trim($name) != '') $props[$name] = '';
+        $name = '';
+        $char = false;
+      }
+      else
+      {
+        # Р Р°Р·РґРµР»РёС‚РµР»СЏ РЅРµС‚Сѓ... Р·РЅР°С‡РёС‚ СЂР°Р·РґРµР»РёС‚РµР»СЊ РІ РєРѕРЅС†Рµ РїСЂРѕР±РµР»
+        $char = ' ';
+      }
+      # Р Р°Р·РґРµР»РёС‚РµР»СЊ РѕРїСЂРµРґРµР»С‘РЅ, С‚РµРїРµСЂСЊ РїРѕР№РјР°С‚СЊ Р·РЅР°С‡РµРЅРёРµ СѓС‡РёС‚С‹РІР°СЏ РєРѕРЅРµС†
+      while (true && $char !== false)
+      {
+        if ($html[$i] == '') break;
+        if ($html[$i] == $char) break;
+        # Р•СЃР»Рё С‚РѕС‚ РєС‚Рѕ РІС‹Р·РІР°Р» С„СѓРЅРєС†РёСЋ РјСѓРґР°Рє, С‚Рѕ РєРѕРЅС†РѕРј РѕР±РµРґР° Р±СѓРґРµС‚ >
+        if ($char == ' ' && $html[$i] == '>') break;
+        $value .= $html[$i];
+        $i++;
+      }
+      $name = strtolower($name);
+      if ($name == 'name') $value = Cleaner($value);
+      $props[strtolower(trim($name))] = trim($value);
+      //if($name=='name')echo '&' . $value .  '(' . strlen($value).')=&<br>';
+      $name = '';
+      $value = '';
+    }
+    else
+    {
+      # Р§Р°СЃС‚СЊ РёРјРµРЅРё
+      $name .= $html[$i];
+    }
+  }
+  return $props;
 }
 
 function Cleaner($t)
 {
-        $alp='abcdefghijklmnopqrstuvwxyz1234567890_-[](){}%&.,=+';
-        $a2='';
-        for($i=0;$i<strlen($t);$i++)
-        {
-                if(stripos($alp,$t[$i])!==false)$a2.=$t[$i];
-                else echo $t[$i] . '<br>';
-        }
-        return $a2;
+  $alp = 'abcdefghijklmnopqrstuvwxyz1234567890_-[](){}%&.,=+';
+  $a2 = '';
+  for ($i = 0; $i < strlen($t); $i++)
+  {
+    if (stripos($alp, $t[$i]) !== false) $a2 .= $t[$i];
+    else echo $t[$i] . '<br>';
+  }
+  return $a2;
 }
-
-
-
-
 
 
 ?>
