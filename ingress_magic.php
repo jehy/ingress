@@ -45,7 +45,7 @@ if(!file_exists($fname))
   $json=( http($query));
   @mkdir('cache',0777);
   #in case of fail
-  if(strpos($json,'error code 503')!==FALSE || strpos($json,'user is not authenticated or is not a player')!==FALSE)
+  if(is_tmp_error($json))
   {
     $fname='cache/err_'.time().'_'.$code.'.txt';
     file_put_contents($fname,$json);
@@ -61,6 +61,18 @@ else
   return 'Already sent';
 }
 
+
+function is_tmp_error($text)
+{
+if(strpos($text,'download error trying to access')!==FALSE)
+  return true;
+if(strpos($text,'error code 503')!==FALSE)
+  return true;
+if(strpos($text,'user is not authenticated or is not a player')!==FALSE)
+  return true;
+
+return false;
+}
 
 function send_msg($cookie,$token,$text)
 {
@@ -107,7 +119,7 @@ if(!file_exists($fname))
   @mkdir('cache',0777);
   $attempt=0;
   $max_attempts=5;
-  if(strpos($json,'error code 503')!==FALSE)
+  if(is_tmp_error($json))
   {
     $fname='cache/err_'.time().'_'.$code.'.txt';
     file_put_contents($fname,$json);
@@ -172,7 +184,7 @@ if(!file_exists($fname))
   $json=( http($query));
   @mkdir('cache',0777);
   
-  if(strpos($json,'error code 503')!==FALSE)
+  if(is_tmp_error($json))
   {
     $fname='cache/err_'.time().'_'.$code.'.txt';
     file_put_contents($fname,$json);
