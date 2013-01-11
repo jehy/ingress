@@ -42,19 +42,29 @@ if($force)
   $fname='cache/code_force_'.($code).'.txt';
 if(!file_exists($fname))
 {
-  $json=( http($query));
-  @mkdir('cache',0777);
-  #in case of fail
-  if(is_tmp_error($json))
+  $attempt=0;
+  $max_attempts=5;
+  while($attempt<$max_attempts)
   {
-    $fname='cache/err_send_'.time().'_'.$code.'.txt';
-    file_put_contents($fname,$json);
-    add_log('Failed to make send password request (503), repeating...',1);
-    sleep(2+rand(1,3));
-    $json=send_passcode($cookie,$token,$code,$force);  
+    $json=( http($query));
+    
+    #in case of fail
+    if(is_tmp_error($json))
+    {
+      $efname='cache/err_send_'.time().'_'.$code.'.txt';
+      file_put_contents($efname,$json);
+      add_log('Failed to make send password request (503), repeating...',1);
+      sleep(2+rand(1,3));
+      $attempt++;
+    }
+    else
+    {
+      file_put_contents($fname,$json);
+      return $json;
+    }
   }
-  file_put_contents($fname,$json);
-  return $json;
+  add_log('Max attempts reached, breaking',1);
+  return false;
 }
 else
   #$json=file_get_contents($fname);
@@ -65,11 +75,20 @@ else
 function is_tmp_error($text)
 {
 if(strpos($text,'download error trying to access')!==FALSE)
+{
+  add_log('error: download error trying to access',1);
   return true;
+}
 if(strpos($text,'error code 503')!==FALSE)
+{
+  add_log('error: error code 503',1);
   return true;
+}
 if(strpos($text,'user is not authenticated or is not a player')!==FALSE)
+{
+  add_log('error: user is not authenticated or is not a player',1);
   return true;
+}
 
 return false;
 }
@@ -115,29 +134,29 @@ $query.= 'Content-Length: ' . strlen($query2)  . "\r\n\r\n";
 $fname='cache/sendmsg_'.time().'.txt';
 if(!file_exists($fname))
 {
-  $json=( http($query));
-  @mkdir('cache',0777);
   $attempt=0;
   $max_attempts=5;
-  if(is_tmp_error($json))
+  while($attempt<$max_attempts)
   {
-    $fname='cache/err_chat_'.time().'.txt';
-    file_put_contents($fname,$json);
-    add_log('Failed to make send chat phrase request (503), repeating...',1);
-    sleep(10+rand(1,10));
-    $json=send_msg($cookie,$token,$text);
-    $attempt++;
-    if($attempt>$max_attempts)
+    $json=( http($query));
+    
+    if(is_tmp_error($json))
     {
-      add_log('Max attempts reached, breaking',1);
-      break;
+      $efname='cache/err_chat_'.time().'.txt';
+      file_put_contents($efname,$json);
+      add_log('Failed to make send chat phrase request (503), repeating...',1);
+      $attempt++;
+      sleep(10+rand(1,10));
+    }
+    else
+    {
+      file_put_contents($fname,$json);
+      return $json;
     }
   }
-  file_put_contents($fname,$json);
-  return $json;
+  add_log('Max attempts reached, breaking',1);
 }
-else
-  return false;
+return false;
 
 }
 function get_log($cookie,$token)
@@ -181,23 +200,31 @@ $query.= 'Content-Length: ' . strlen($query2)  . "\r\n\r\n";
 $fname='cache/chat_'.time().'.txt';
 if(!file_exists($fname))
 {
+  $attempt=0;
+  $max_attempts=5;
+  while($attempt<$max_attempts)
+  {
   $json=( http($query));
-  @mkdir('cache',0777);
+  
   
   if(is_tmp_error($json))
   {
-    $fname='cache/err_log_'.time().'.txt';
-    file_put_contents($fname,$json);
+    $efname='cache/err_log_'.time().'.txt';
+    file_put_contents($efname,$json);
     add_log('Failed to make send chat log request (503), repeating...',1);
     sleep(2+rand(1,3));
-    $json=get_log($cookie,$token);  
+    $attempt++;
   }
+  else
+  {
   file_put_contents($fname,$json);
   return $json;
+  }
+  }
+  add_log('Max attempts reached, breaking',1);
 }
 else
   return false;
-  #$json=file_get_contents($fname);
 }
 function f_connect()
 {
