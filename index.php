@@ -18,8 +18,12 @@ set_log('log');
 
 sleep(rand(1, 10));
 #error_reporting(E_ALL);
-
-$json = get_chat_log($cookie_checker, $token_checker,true);
+$from=-1;
+if(file_exists('cache/last_timestamp.txt'))
+{
+  $from=file_get_contents('cache/last_timestamp.txt');
+}
+$json = get_chat_log($cookie_checker, $token_checker,true,$from);
 if (!$json)
 {
   add_log('No new info in current second!', 1);
@@ -39,28 +43,23 @@ if (!is_array($a))
   die();
 }
 else add_log('Chat log: ', 1);
-foreach ($a as $key => $val)
-  foreach ($val as $key2 => $val2)
+#foreach ($a as $key => $val)
+  $last_timestamp=-1;
+  foreach ($a['result'] as $key2 => $val2)# ($val as $key2 => $val2)
   {
     $s = $val2[2]['plext']['text'];
+    if($last_timestamp==-1)
+      $last_timestamp=$val2[1];
+    #add_log('Last timestamp: '.intval($last_timestamp),1);
+    $time=date('Y-m-d H:i:s',floor($val2[1]/1000));
     $contains_pass = 0;
     #$s='woldklfnm wef !vakavaka131, shit passcode some more shitty shit';
-    if (strpos($s, 'deployed'))
-      continue;
-    if (strpos($s, 'destroyed'))
-      continue;
-    if (strpos($s, 'captured'))
-      continue;
-    if (strpos($s, 'linked'))
-      continue;
-    if (strpos($s, 'has decayed'))
-      continue;
-    if (strpos($s, 'created a Control Field'))
+    if(is_action_message($s))
       continue;
     $p = strpos($s, ': ');
     $b = substr($s, 0, $p + 2);
     $s = substr($s, $p + 2);
-    add_log('<font color="green">' . $b . '</font>' . $s, 1);
+    add_log('<font color="green">'.$time . $b . '</font>' . $s, 1);
     if (stripos($s, 'passcode') !== FALSE)
       $contains_pass = 1;
     $s = str_replace(array(',', '.', "\n", "\t", "\r", "-", "!", ':', ';'), ' ', $s);
@@ -92,6 +91,8 @@ foreach ($a as $key => $val)
       $codes[] = $val;
     }
   }
+add_log('Last timestamp: '.$last_timestamp,1);
+file_put_contents('cache/last_timestamp.txt',(string)$last_timestamp);
 add_log('<hr>', 1);
 if (sizeof($codes))
 {

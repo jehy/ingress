@@ -162,7 +162,7 @@ function send_msg($cookie, $token, $text)
 
 }
 
-function get_chat_log($cookie, $token,$fraction=true)
+function get_chat_log($cookie, $token,$fraction=true,$from=-1)
 {
 
   $useragent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11';
@@ -193,15 +193,16 @@ function get_chat_log($cookie, $token,$fraction=true)
     'Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.3' . "\r\n";
 
 #search global area
-  $query2 = '{"desiredNumItems":100,"minLatE6":-90000000,"minLngE6":-180000000,"maxLatE6":90000000,"maxLngE6":180000000,"minTimestampMs":-1,"maxTimestampMs":-1';
+  $query2 = '{"desiredNumItems":100,"minLatE6":-90000000,"minLngE6":-180000000,"maxLatE6":90000000,"maxLngE6":180000000,"minTimestampMs":'.$from.',"maxTimestampMs":-1';
   if($fraction)
     $query2.=',"factionOnly":true';
+  #',"ascendingTimestampOrder":true
   $query2.=',"method":"dashboard.getPaginatedPlextsV2"}';
 
 
   $query .= 'Content-Length: ' . strlen($query2) . "\r\n\r\n";
   $query .= $query2;
-
+  #add_log($query,1);
 
   $fname = 'cache/chat_' . time() . '.txt';
   if (!file_exists($fname))
@@ -247,6 +248,24 @@ function check_badgerov($code)
   return 0;
 }
 
+function is_action_message($s)
+{
+
+  if (strpos($s, 'deployed'))
+    return 1;
+  if (strpos($s, 'destroyed'))
+    return 1;
+  if (strpos($s, 'captured'))
+    return 1;
+  if (strpos($s, 'linked'))
+    return 1;
+  if (strpos($s, 'has decayed'))
+    return 1;
+  if (strpos($s, 'created a Control Field'))
+    return 1;
+
+  return 0;
+}
 
 function rand_shit()
 {
