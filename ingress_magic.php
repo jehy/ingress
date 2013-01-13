@@ -162,7 +162,7 @@ function send_msg($cookie, $token, $text)
 
 }
 
-function get_log($cookie, $token)
+function get_chat_log($cookie, $token,$fraction=true)
 {
 
   $useragent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11';
@@ -193,7 +193,10 @@ function get_log($cookie, $token)
     'Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.3' . "\r\n";
 
 #search global area
-  $query2 = '{"desiredNumItems":300,"minLatE6":-90000000,"minLngE6":-180000000,"maxLatE6":90000000,"maxLngE6":180000000,"minTimestampMs":-1,"maxTimestampMs":-1,"method":"dashboard.getPaginatedPlextsV2"}';
+  $query2 = '{"desiredNumItems":100,"minLatE6":-90000000,"minLngE6":-180000000,"maxLatE6":90000000,"maxLngE6":180000000,"minTimestampMs":-1,"maxTimestampMs":-1';
+  if($fraction)
+    $query2.=',"factionOnly":true';
+  $query2.=',"method":"dashboard.getPaginatedPlextsV2"}';
 
 
   $query .= 'Content-Length: ' . strlen($query2) . "\r\n\r\n";

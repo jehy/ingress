@@ -19,7 +19,7 @@ set_log('log');
 sleep(rand(1, 10));
 #error_reporting(E_ALL);
 
-$json = get_log($cookie_checker, $token_checker);
+$json = get_chat_log($cookie_checker, $token_checker,true);
 if (!$json)
 {
   add_log('No new info in current second!', 1);
