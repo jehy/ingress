@@ -40,8 +40,11 @@ Cookie: ' . $cookie . '
 
 ' . $query2;
   $fname = 'cache/code_' . ($code) . '.txt';
-  if ($force)
-    $fname = 'cache/code_force_' . ($code) . '.txt';
+  $fname_force = 'cache/code_force_' . ($code) . '.txt';
+
+  if($force)# || file_exists($fname))
+    $fname=$fname_force;
+
   if (!file_exists($fname))
   {
     $attempt = 0;

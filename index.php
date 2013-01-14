@@ -7,7 +7,7 @@
 <body>
 <?
 date_default_timezone_set('Europe/Moscow');
-set_time_limit(50);
+set_time_limit(70);
 chdir('C:\WEB\htdocs\localhost\ingress');
 include 'http_magic.php';
 include 'ingress_magic.php';
