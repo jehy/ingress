@@ -165,7 +165,7 @@ function send_msg($cookie, $token, $text)
 
 }
 
-function get_chat_log($cookie, $token,$fraction=true,$from=-1)
+function get_chat_log($cookie, $token,$fraction=true,$from=-1,$to=-1,$minlat='-90000000', $minlng='-180000000', $maxlat='90000000', $maxlng='180000000',$maxnum='100')
 {
 
   $useragent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11';
@@ -196,7 +196,7 @@ function get_chat_log($cookie, $token,$fraction=true,$from=-1)
     'Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.3' . "\r\n";
 
 #search global area
-  $query2 = '{"desiredNumItems":100,"minLatE6":-90000000,"minLngE6":-180000000,"maxLatE6":90000000,"maxLngE6":180000000,"minTimestampMs":'.$from.',"maxTimestampMs":-1';
+  $query2 = '{"desiredNumItems":'.$maxnum.',"minLatE6":'.$minlat.',"minLngE6":'.$minlng.',"maxLatE6":'.$maxlat.',"maxLngE6":'.$maxlng.',"minTimestampMs":'.$from.',"maxTimestampMs":'.$to;
   if($fraction)
     $query2.=',"factionOnly":true';
   #',"ascendingTimestampOrder":true
@@ -215,7 +215,7 @@ function get_chat_log($cookie, $token,$fraction=true,$from=-1)
     while ($attempt < $max_attempts)
     {
       $json = (http($query));
-
+      #add_log($json,1);
 
       if (is_tmp_error($json))
       {
