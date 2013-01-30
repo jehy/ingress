@@ -11,6 +11,7 @@ set_time_limit(70);
 #chdir('D:\WEB\htdocs\localhost\ingress');
 include 'http_magic.php';
 include 'ingress_magic.php';
+include 'chat_user_data.php';
 
 if(file_exists('userdata.cache.txt')&&(filemtime('userdata.cache.txt')>filemtime('userdata.php')))
 {
