@@ -11,7 +11,17 @@ set_time_limit(70);
 #chdir('D:\WEB\htdocs\localhost\ingress');
 include 'http_magic.php';
 include 'ingress_magic.php';
-include 'userdata.php';
+
+if(file_exists('userdata.cache.txt')&&(filemtime('userdata.cache.txt')>filemtime('userdata.php')))
+{
+  add_log('Using cached user data',1);
+  $user=unserialize(file_get_contents('userdata.cache.txt'));
+}
+else
+{
+  add_log('Using user data from php file',1);
+  include 'userdata.php';
+}
 
 add_log('current reload: ' . date('Y-m-d H:i:s') . '<hr>', 1);
 set_log('log');
@@ -23,12 +33,14 @@ if(file_exists('cache/last_timestamp.txt'))
 {
   $from=file_get_contents('cache/last_timestamp.txt');
 }
-$json = get_chat_log($cookie_checker, $token_checker,true,$from);
+$json = get_chat_log($user['cookie_checker'], $user['token_checker'],true,$from);
 if (!$json)
 {
   add_log('No new info in current second!', 1);
   die();
 }
+$user2=$user;
+$user2['cookie_checker']=update_cookie($json,$user['cookie_checker']);
 
 $codes = array();
 #die(date('H-i:s',1357416232198));
@@ -91,7 +103,7 @@ else add_log('Chat log: ', 1);
       $codes[] = $val;
     }
   }
-add_log('Last timestamp: '.$last_timestamp,1);
+add_log('Last timestamp: '.(string)$last_timestamp,1);
 file_put_contents('cache/last_timestamp.txt',(string)$last_timestamp);
 add_log('<hr>', 1);
 if (sizeof($codes))
@@ -122,7 +134,7 @@ foreach ($codes as $val)
     add_log('Found in badgerov DB, skipping',1);
     continue;
   }*/
-  $json = send_passcode($cookie_checker, $token_checker, $val);
+  $json = send_passcode($user['cookie_checker'], $user['token_checker'], $val);
   if ($json === 'Already sent')
   {
     add_log('Already sent', 1);
@@ -136,11 +148,12 @@ foreach ($codes as $val)
     if (stripos($r, 'Award') !== FALSE)
     {
       add_log('<font color="green">Success! Sending 2</font><ul>', 1);
-      $r2 = send_passcode($cookie_to, $token_to, $val, 1);
+      $r2 = send_passcode($user['cookie_to'], $user['token_to'], $val, 1);
+      $user2['cookie_to']=update_cookie($json,$user['cookie_to']);
       if (stripos($r2, 'Award'))
       {
         add_log('<font color="green">Success 2!</font>', 1);
-        send_msg($cookie_to, $token_to, trim(rand_shit()) . ' ' . $val);
+        send_msg($user['cookie_to'], $user['token_to'], trim(rand_shit()) . ' ' . $val);
       }
       else
         add_log('<font color="red">Fail on 2!</font>', 1);
@@ -153,6 +166,11 @@ foreach ($codes as $val)
   add_log('</ul>', 1);
   flush();
   ob_flush();
+}
+if(serialize($user)!==serialize($user2))
+{
+  add_log('Caching new user cookie',1);
+  file_put_contents('userdata.cache.txt',serialize($user2));
 }
 add_log('<hr>Task finished<br><br>', 1);
 flush();

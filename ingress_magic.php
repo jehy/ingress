@@ -1,4 +1,27 @@
 <?
+
+
+function update_cookie($json,$current_cookie)
+{
+  $header = explode("\r\n\r\n",$json);
+  $header=$header[0];
+  $p=strpos($header,'Set-Cookie:');
+  if($p===FALSE)
+    return $current_cookie;
+  $p=strpos($header," ",$p+1);
+  $p2=strpos($header,"\n",$p+1);
+  $cookie=substr($header,$p,$p2-$p);
+  $cookie=trim($cookie);
+  $cookie=explode(';',$cookie);
+  $cookie=$cookie[0];
+  $cookie=explode('=',$cookie);
+
+  $replaced_cookie=preg_replace('/'.$cookie[0].'=(.*?);/',$cookie[0].'='.$cookie[1].';',$current_cookie);
+  #add_log('New cookie value: '.$cookie,1);
+  #add_log('Old cookie: '.$current_cookie,1);
+  #add_log('New cookie: '.$replaced_cookie,1);
+  return $replaced_cookie;
+}
 function set_log($name)
 {
   global $LOG_FILE;

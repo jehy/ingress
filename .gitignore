@@ -2,6 +2,7 @@
 cache/*
 userdata.php
 passcode_phrases.txt
+userdata.cache.txt
 *.sql
 .idea/*
 #################
