@@ -12,6 +12,7 @@ set_time_limit(70);
 include 'http_magic.php';
 include 'ingress_magic.php';
 include 'chat_user_data.php';
+include 'badgerov.php';
 
 if(file_exists('userdata.cache.txt')&&(filemtime('userdata.cache.txt')>filemtime('userdata.php')))
 {
@@ -159,10 +160,13 @@ foreach ($codes as $val)
       else
         add_log('<font color="red">Fail on 2!</font>', 1);
       add_log('</ul>', 1);
-
+      IIBbase::codeSend($val,1);
     }
     else
+    {
       add_log('Failed: ' . $r, 1);
+      IIBbase::codeSend($val,0);
+    }
   }
   add_log('</ul>', 1);
   flush();

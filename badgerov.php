@@ -29,16 +29,17 @@ class IIBbase {
 	}
 
 	private static function error($txt,$dump=array()) {
-		die('Shit happens: '.$txt.' <hr/><pre>'.print_r($dump,1));
+		add_log('Shit happens: '.$txt.' <hr/><pre>'.print_r($dump,1).'</pre>',1);
 	}
 	
 	private static function base_get_contents($params=array()) {
+    global $user;
 		$url = 'http://iib.evilplace.ru/words.php';
 		$time = time();
 		$params = array_merge($params, array(
 			't' => $time,
-			'h' => 'yemu2ukth8p',  											# <<<<<<--------------- public key
-			'k' => md5($time.'z9=^_^=a0'.'ay3j31ovi1'),	# <<<<<<--------------- sec2 key
+			'h' => $user['public_key'],  											# <<<<<<--------------- public key
+			'k' => md5($time.'z9=^_^=a0'.$user['sec2_key']),	# <<<<<<--------------- sec2 key
 		));
 		
 		$timeout = 10;
@@ -48,7 +49,6 @@ class IIBbase {
 			'method'  => 'POST',
 			'header'  => array(
 				'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-				'Accept-Encoding' => 'gzip, deflate',
 				'Accept-Language' => 'ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3',
 				'Connection' => 'Close',
 				'Content-Type' => 'application/x-www-form-urlencoded',
@@ -60,7 +60,9 @@ class IIBbase {
 			'ignore_errors' => true,
 		) );
 		$urlParsed = parse_url($url);
-		$opts['http']['header']['Host'] = $urlParsed['host'];
+
+    #add_log(var_export($opts,1),1);
+    $opts['http']['header']['Host'] = $urlParsed['host'];
 		if (!empty($params)) { $opts['http']['header']['Content-Length'] = mb_strlen($opts['http']['content']); }
 
 		$header = '';

@@ -259,7 +259,7 @@ function get_chat_log($cookie, $token,$fraction=true,$from=-1,$to=-1,$minlat='-9
   else
     return false;
 }
-
+/*
 function f_connect()
 {
   $db = mysql_connect('localhost', 'root', '');
@@ -273,7 +273,7 @@ function check_badgerov($code)
     return 1;
   return 0;
 }
-
+*/
 function is_action_message($s)
 {
 
